@@ -1,4 +1,6 @@
-# Model Checker
+# Model Checker (WIP)
+
+![img](./images/ui.png)
 
 ## Requirements
 
