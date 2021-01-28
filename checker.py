@@ -346,7 +346,6 @@ class VertexPntsChecker(BaseChecker):
             if cmds.objExists(e.longName):
                 obj = e.longName
                 mSel.add(obj)
-                dagPath = mSel.getDagPath(n)
                 try:
                     cmds.polyMoveVertex(
                         obj, lt=(0, 0, 0), nodeState=1, ch=False)
@@ -389,10 +388,12 @@ class ShapeNameChecker(BaseChecker):
         self.errors = []
 
         for obj in objs:
-            shapes = cmds.listRelatives(obj, children=True, fullPath=True, shapes=True) or []
+            shapes = cmds.listRelatives(
+                obj, children=True, fullPath=True, shapes=True) or []
             if shapes:
                 for shape in shapes:
-                    isIntermediate = cmds.getAttr(shape + ".intermediateObject")
+                    isIntermediate = cmds.getAttr(
+                        shape + ".intermediateObject")
                     if isIntermediate:
                         continue
                     shortName = obj.split("|")[-1]
@@ -699,8 +700,9 @@ class DisplayLayerCheck(BaseChecker):
         for e in self.errors:
             layers = e.components
             node = e.longName
-            for l in layers:
-                cmds.disconnectAttr(l + ".drawInfo", node + ".drawOverride")
+            for layer in layers:
+                cmds.disconnectAttr(
+                    layer + ".drawInfo", node + ".drawOverride")
 
 
 class UnusedLayerChecker(BaseChecker):
@@ -903,6 +905,31 @@ class ZeroAreaUVFaceChecker(BaseChecker):
         pass
 
 
+class ConcaveUVChecker(BaseChecker):
+
+    __name__ = "Concave UV Faces"
+    __category__ = "UV"
+
+    def checkIt(self, objs, settings=None):
+
+        self.errors = []
+
+        for obj in objs:
+            try:
+                uvs = cmds.checkUV(obj, c=5)
+                if uvs:
+                    err = Error(obj, uvs)
+                    self.errors.append(err)
+            except RuntimeError:
+                # Not mesh. Do no nothing
+                pass
+
+        return self.errors
+
+    def fixIt(self):
+        pass
+
+
 class UvOverlapChecker(BaseChecker):
 
     __name__ = "UV Overlaps"
@@ -945,7 +972,8 @@ class SelectionSetChecker(BaseChecker):
             conns = cmds.listConnections(path + ".instObjGroups") or []
             return [i for i in conns if cmds.objectType(i) == "objectSet"]
         elif typ == "shape":
-            conns = cmds.listConnections(path + ".instObjGroups.objectGroups") or []
+            conns = cmds.listConnections(
+                path + ".instObjGroups.objectGroups") or []
             return [i for i in conns if cmds.objectType(i) == "objectSet"]
         else:
             pass
@@ -960,7 +988,8 @@ class SelectionSetChecker(BaseChecker):
         ignore = ["modelPanel[0-9]ViewSelectedSet"]
 
         for obj in objs:
-            shapes = cmds.listRelatives(obj, children=True, fullPath=True, shapes=True) or []
+            shapes = cmds.listRelatives(
+                obj, children=True, fullPath=True, shapes=True) or []
             for shape in shapes:
                 objectSets.extend(self.getSets(shape, "shape"))
             objectSets.extend(self.getSets(obj, "transform"))
@@ -1010,7 +1039,8 @@ class ColorSetChecker(BaseChecker):
 
     def fixIt(self):
         for i in self.errors:
-            allSets = cmds.polyColorSet(i.longName, q=True, allColorSets=True) or []
+            allSets = cmds.polyColorSet(
+                i.longName, q=True, allColorSets=True) or []
             for s in allSets:
                 cmds.polyColorSet(i.longName, delete=True, colorSet=s)
 
@@ -1044,6 +1074,7 @@ CHECKERS = [
     UnassignedUvChecker,
     UnmappedPolygonFaceChecker,
     ZeroAreaUVFaceChecker,
+    ConcaveUVChecker,
     UvOverlapChecker,
     SelectionSetChecker,
     ColorSetChecker]
