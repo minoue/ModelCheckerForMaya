@@ -140,7 +140,7 @@ class NgonChecker(BaseChecker):
         pass
 
 
-class NonmanifoldChecker(BaseChecker):
+class NonmanifoldEdgeChecker(BaseChecker):
 
     __name__ = "Nonmanifold Edges"
     __category__ = "Topology"
@@ -153,6 +153,31 @@ class NonmanifoldChecker(BaseChecker):
         for obj in objs:
             try:
                 errs = cmds.checkMesh(obj, c=2)
+                if errs:
+                    errorObj = Error(obj, errs)
+                    errors.append(errorObj)
+            except RuntimeError:
+                pass
+
+        return errors
+
+    def fixIt(self):
+        pass
+
+
+class NonmanifoldVertexChecker(BaseChecker):
+
+    __name__ = "Nonmanifold Vertices"
+    __category__ = "Topology"
+
+    def checkIt(self, objs, settings=None):
+        # type: (list) -> (list)
+
+        errors = []
+
+        for obj in objs:
+            try:
+                errs = cmds.polyInfo(obj, nmv=True)
                 if errs:
                     errorObj = Error(obj, errs)
                     errors.append(errorObj)
@@ -1056,7 +1081,8 @@ CHECKERS = [
     KeyframeChecker,
     TriangleChecker,
     NgonChecker,
-    NonmanifoldChecker,
+    NonmanifoldEdgeChecker,
+    NonmanifoldVertexChecker,
     LaminaFaceChecker,
     BiValentFaceChecker,
     ZeroAreaFaceChecker,
