@@ -955,6 +955,32 @@ class ConcaveUVChecker(BaseChecker):
         pass
 
 
+class ReversedUVChecker(BaseChecker):
+
+    __name__ = "Reversed UV Faces"
+    __category__ = "UV"
+    isWarning = True
+
+    def checkIt(self, objs, settings=None):
+
+        self.errors = []
+
+        for obj in objs:
+            try:
+                uvs = cmds.checkUV(obj, c=6)
+                if uvs:
+                    err = Error(obj, uvs)
+                    self.errors.append(err)
+            except RuntimeError:
+                # Not mesh. Do no nothing
+                pass
+
+        return self.errors
+
+    def fixIt(self):
+        pass
+
+
 class UvOverlapChecker(BaseChecker):
 
     __name__ = "UV Overlaps"
@@ -1101,6 +1127,7 @@ CHECKERS = [
     UnmappedPolygonFaceChecker,
     ZeroAreaUVFaceChecker,
     ConcaveUVChecker,
+    ReversedUVChecker,
     UvOverlapChecker,
     SelectionSetChecker,
     ColorSetChecker]
