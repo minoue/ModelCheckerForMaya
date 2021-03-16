@@ -562,29 +562,6 @@ class SmoothPreviewChecker(BaseChecker):
             cmds.setAttr(e.longName + ".displaySmoothMesh", 0)
 
 
-class InputConnectionChecker(BaseChecker):
-
-    __name__ = "Input Connections"
-    __category__ = "other"
-    isEnabled = False
-
-    def checkIt(self, objs, settings=None):
-        # type: (list) -> (list)
-
-        errors = []
-
-        for obj in objs:
-            try:
-                pass
-            except RuntimeError:
-                pass
-
-        return errors
-
-    def fixIt(self):
-        pass
-
-
 class KeyframeChecker(BaseChecker):
 
     __name__ = "Keyframe"
@@ -1103,7 +1080,6 @@ CHECKERS = [
     TransformChecker,
     LockedTransformChecker,
     SmoothPreviewChecker,
-    InputConnectionChecker,
     KeyframeChecker,
     TriangleChecker,
     NgonChecker,
