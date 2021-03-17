@@ -335,6 +335,8 @@ class MainWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         cmds.workspaceControl(
             self.workspaceControlName,
             edit=True,
+            initialWidth=270,
+            minimumWidth=270,
             dockToControl=['Outliner', 'right'])
         self.raise_()
 
