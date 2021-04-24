@@ -668,7 +668,7 @@ class IntermediateObjectChecker(BaseChecker):
             shape = e.longName
 
             if cmds.objExists(shape):
-                parents = cmds.listRelatives(shape, parent=True) or []
+                parents = cmds.listRelatives(shape, fullPath=True, parent=True) or []
                 for i in parents:
                     # Delete history for parents
                     cmds.delete(i, ch=True)
