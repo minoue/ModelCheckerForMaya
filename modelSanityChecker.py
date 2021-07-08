@@ -78,19 +78,20 @@ class CheckerWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-    def check(self):
+    def check(self, path=None):
         if not self.checker.isEnabled:
             return
 
-        sel = cmds.ls(sl=True, fl=True, long=True)
-
-        if not sel:
-            cmds.warning("Nothing is selected")
-            return
+        if path is None:
+            sel = cmds.ls(sl=True, fl=True, long=True)
+            if not sel:
+                cmds.warning("Nothing is selected")
+                return
+            path = sel[0]
 
         children = cmds.listRelatives(
-            sel[0], children=True, ad=True, fullPath=True, type="transform") or []
-        children.append(sel[0])
+            path, children=True, ad=True, fullPath=True, type="transform") or []
+        children.append(path)
 
         self.doCheck(children)
 
@@ -198,23 +199,40 @@ class ModelSanityChecker(QtWidgets.QWidget):
 
         scroll.setWidget(content)
 
+        self.rootLE = QtWidgets.QLineEdit()
+        setButton = QtWidgets.QPushButton("Set Selected")
+        setButton.clicked.connect(self.setSelected)
+
         checkAllButton = QtWidgets.QPushButton("Check All")
         checkAllButton.clicked.connect(self.checkAll)
 
         fixAllButton = QtWidgets.QPushButton("Fix All")
         fixAllButton.clicked.connect(self.fixAll)
 
+        rootLayout = QtWidgets.QHBoxLayout()
+        rootLayout.addWidget(self.rootLE)
+        rootLayout.addWidget(setButton)
+
+        mainLayout.addLayout(rootLayout)
         mainLayout.addWidget(scroll)
         mainLayout.addWidget(checkAllButton)
         mainLayout.addWidget(fixAllButton)
 
         self.setLayout(mainLayout)
 
+    def setSelected(self):
+        sel = cmds.ls(sl=True, fl=True, long=True)
+        if sel:
+            root = sel[0]
+            self.rootLE.setText(root)
+
     def checkAll(self):
         """
         Check all
 
         """
+
+        node = self.rootLE.text()
 
         progDialog = QtWidgets.QProgressDialog(
             "Now Checking...",
@@ -227,7 +245,11 @@ class ModelSanityChecker(QtWidgets.QWidget):
         progDialog.show()
 
         for num, widget in enumerate(self.checkerWidgets):
-            widget.check()
+            if node == "":
+                widget.check()
+            else:
+                widget.check(node)
+
             progDialog.setValue(num+1)
             progDialog.setLabel(
                 QtWidgets.QLabel(r'Now checking "{}"'.format(widget.checker.name)))
