@@ -8,8 +8,6 @@ from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya import cmds
 from . import checker
 from . import framelayout
-reload(checker)
-reload(framelayout)
 
 
 class Separator(QtWidgets.QWidget):
