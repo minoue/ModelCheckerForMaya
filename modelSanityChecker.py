@@ -8,6 +8,10 @@ from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya import cmds
 from . import checker
 from . import framelayout
+from importlib import reload
+
+reload(framelayout)
+reload(checker)
 
 
 class Separator(QtWidgets.QWidget):
@@ -45,13 +49,13 @@ class CheckerWidget(QtWidgets.QWidget):
 
     def createUI(self):
         layout = QtWidgets.QBoxLayout(QtWidgets.QBoxLayout.LeftToRight)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        layout.setAlignment(QtCore.Qt.AlignTop)
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
 
         self.frame = framelayout.FrameLayout(self.checker.name)
-        if not self.checker.isEnabled:
-            self.setEnabled(False)
+
+        self.checkbox = QtWidgets.QCheckBox()
+        self.checkbox.stateChanged.connect(self.toggleEnable)
 
         self.checkButton = QtWidgets.QPushButton("Check")
         # self.checkButton.setSizePolicy(
@@ -72,11 +76,20 @@ class CheckerWidget(QtWidgets.QWidget):
         self.frame.addWidget(self.errorList)
         self.frame.addLayout(buttonLayout)
 
+        layout.addWidget(self.checkbox, alignment=QtCore.Qt.AlignTop)
         layout.addWidget(self.frame)
 
         self.setLayout(layout)
 
-    def check(self, path=None):
+        if self.checker.isEnabled:
+            self.checkbox.setChecked(True)
+            self.frame.setEnabled(True)
+            self.checker.isEnabled = True
+        else:
+            self.frame.setEnabled(False)
+            self.checker.isEnabled = False
+
+    def check(self, path=None, dummy=None):
         if not self.checker.isEnabled:
             return
 
@@ -88,10 +101,27 @@ class CheckerWidget(QtWidgets.QWidget):
             path = sel[0]
 
         children = cmds.listRelatives(
-            path, children=True, ad=True, fullPath=True, type="transform") or []
+            path,
+            children=True,
+            ad=True,
+            fullPath=True,
+            type="transform") or []
+
         children.append(path)
 
         self.doCheck(children)
+
+    def toggleEnable(self, *args):
+        state = args[0]
+
+        if state == 2:
+            self.frame.setEnabled(True)
+            self.checker.isEnabled = True
+        elif state == 0:
+            self.frame.setEnabled(False)
+            self.checker.isEnabled = False
+        else:
+            pass
 
     def doCheck(self, objs):
 
@@ -243,10 +273,16 @@ class ModelSanityChecker(QtWidgets.QWidget):
         progDialog.show()
 
         for num, widget in enumerate(self.checkerWidgets):
-            if node == "":
-                widget.check()
+            checkerName = widget.checker.name
+            if widget.checker.isEnabled:
+                print("Running {} checker".format(checkerName))
+                if node == "":
+                    widget.check()
+                else:
+                    widget.check(node)
             else:
-                widget.check(node)
+                print("{} checker is disabled. Skipped".format(checkerName))
+
 
             progDialog.setValue(num+1)
             progDialog.setLabel(
