@@ -55,8 +55,8 @@ class FrameLayout(QtWidgets.QWidget):
         self.childrenWidget.hide()
 
     def titleClicked(self):
-        """ 
-        title clicked action 
+        """
+        title clicked action
 
         """
 

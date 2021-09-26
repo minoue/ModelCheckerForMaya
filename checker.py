@@ -35,7 +35,6 @@ class Error(QtWidgets.QListWidgetItem):
     def __init__(self, fullPath, errors=None, parent=None):
         # type: (str, list) -> (None)
         super(Error, self).__init__(parent)
-
         self.components = errors
         self.longName = fullPath
         self.shortName = fullPath.split("|")[-1]
@@ -668,7 +667,8 @@ class IntermediateObjectChecker(BaseChecker):
             shape = e.longName
 
             if cmds.objExists(shape):
-                parents = cmds.listRelatives(shape, fullPath=True, parent=True) or []
+                parents = cmds.listRelatives(
+                    shape, fullPath=True, parent=True) or []
                 for i in parents:
                     # Delete history for parents
                     cmds.delete(i, ch=True)
