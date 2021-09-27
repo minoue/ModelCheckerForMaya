@@ -71,6 +71,18 @@ class FrameLayout(QtWidgets.QWidget):
 
         self.titleLabel.setText(newTitle)
 
+    def collapse(self):
+        newTitle = ""
+        self.childrenWidget.hide()
+        newTitle = self.rightArrow + self.baseTitle
+        self.titleLabel.setText(newTitle)
+
+    def expand(self):
+        newTitle = ""
+        self.childrenWidget.show()
+        newTitle = self.rightArrow + self.baseTitle
+        self.titleLabel.setText(newTitle)
+
     def addWidget(self, widget):
         # type: (QtWidgets.QWidget) -> None
         """

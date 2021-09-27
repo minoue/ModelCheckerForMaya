@@ -16,8 +16,15 @@ reload(checker)
 
 class Separator(QtWidgets.QWidget):
 
-    def __init__(self, category="", parent=None):
-        super(Separator, self).__init__(parent)
+    def __init__(self, category="", checkers=None):
+        super(Separator, self).__init__()
+
+        self.checkerWidgets = checkers
+        self.category = category
+
+        cb = QtWidgets.QCheckBox()
+        cb.setChecked(True)
+        cb.stateChanged.connect(self.checkboxToggle)
 
         line = QtWidgets.QFrame()
         line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -29,12 +36,23 @@ class Separator(QtWidgets.QWidget):
         font.setCapitalization(QtGui.QFont.AllUppercase)
         font.setBold(True)
         label.setFont(font)
+
         layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(cb)
         layout.addWidget(line)
         layout.addWidget(label)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        # layout.setSpacing(0)
+        layout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(layout)
+
+    def checkboxToggle(self, *args):
+        state = args[0]
+        for w in self.checkerWidgets:
+            if self.category == w.checker.category:
+                if state == 2:
+                    w.setEnabled(True)
+                else:
+                    w.setEnabled(False)
 
 
 class CheckerWidget(QtWidgets.QWidget):
@@ -82,11 +100,19 @@ class CheckerWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
         if self.checker.isEnabled:
+            self.setEnabled(True)
+        else:
+            self.setEnabled(False)
+
+    def setEnabled(self, state):
+        if state is True:
             self.checkbox.setChecked(True)
             self.frame.setEnabled(True)
             self.checker.isEnabled = True
         else:
+            self.checkbox.setChecked(False)
             self.frame.setEnabled(False)
+            self.frame.collapse()
             self.checker.isEnabled = False
 
     def check(self, path=None, dummy=None):
@@ -115,13 +141,9 @@ class CheckerWidget(QtWidgets.QWidget):
         state = args[0]
 
         if state == 2:
-            self.frame.setEnabled(True)
-            self.checker.isEnabled = True
-        elif state == 0:
-            self.frame.setEnabled(False)
-            self.checker.isEnabled = False
+            self.setEnabled(True)
         else:
-            pass
+            self.setEnabled(False)
 
     def doCheck(self, objs):
 
@@ -199,7 +221,6 @@ class ModelSanityChecker(QtWidgets.QWidget):
         self.checkerWidgets = [CheckerWidget(i, settings) for i in checkerObjs]
         self.createUI()
 
-
     def createUI(self):
         """
         GUI method
@@ -214,12 +235,12 @@ class ModelSanityChecker(QtWidgets.QWidget):
 
         scrollLayout = QtWidgets.QVBoxLayout()
         currentCategory = self.checkerWidgets[0].checker.category
-        scrollLayout.addWidget(Separator(currentCategory))
+        scrollLayout.addWidget(Separator(currentCategory, self.checkerWidgets))
         for widget in self.checkerWidgets:
             if currentCategory != widget.checker.category:
                 cat = widget.checker.category
                 currentCategory = cat
-                scrollLayout.addWidget(Separator(cat))
+                scrollLayout.addWidget(Separator(cat, self.checkerWidgets))
             scrollLayout.addWidget(widget)
 
         content = QtWidgets.QWidget()
@@ -230,6 +251,10 @@ class ModelSanityChecker(QtWidgets.QWidget):
         self.rootLE = QtWidgets.QLineEdit()
         setButton = QtWidgets.QPushButton("Set Selected")
         setButton.clicked.connect(self.setSelected)
+
+        checkboxAll = QtWidgets.QCheckBox("Select All")
+        checkboxAll.setChecked(True)
+        checkboxAll.stateChanged.connect(self.selectAllToggle)
 
         checkAllButton = QtWidgets.QPushButton("Check All")
         checkAllButton.clicked.connect(self.checkAll)
@@ -242,11 +267,20 @@ class ModelSanityChecker(QtWidgets.QWidget):
         rootLayout.addWidget(setButton)
 
         mainLayout.addLayout(rootLayout)
+        mainLayout.addWidget(checkboxAll)
         mainLayout.addWidget(scroll)
         mainLayout.addWidget(checkAllButton)
         mainLayout.addWidget(fixAllButton)
 
         self.setLayout(mainLayout)
+
+    def selectAllToggle(self, *args):
+        state = args[0]
+        for w in self.checkerWidgets:
+            if state == 2:
+                w.setEnabled(True)
+            else:
+                w.setEnabled(False)
 
     def setSelected(self):
         sel = cmds.ls(sl=True, fl=True, long=True)
