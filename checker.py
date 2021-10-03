@@ -14,19 +14,19 @@ if not cmds.pluginInfo("meshChecker", q=True, loaded=True):
     try:
         cmds.loadPlugin("meshChecker")
     except RuntimeError:
-        raise RuntimeError("Failed to load plugin")
+        cmds.warning("Failed to load meshChecker plugin")
 
 if not cmds.pluginInfo("uvChecker", q=True, loaded=True):
     try:
         cmds.loadPlugin("uvChecker")
     except RuntimeError:
-        raise RuntimeError("Failed to load plugin")
+        cmds.warning("Failed to load uvChecker plugin")
 
 if not cmds.pluginInfo("findUvOverlaps", q=True, loaded=True):
     try:
         cmds.loadPlugin("findUvOverlaps")
     except RuntimeError:
-        raise RuntimeError("Failed to load plugin")
+        cmds.warning("Failed to load uvOverlap checker plugin")
 
 
 class Error(QtWidgets.QListWidgetItem):
