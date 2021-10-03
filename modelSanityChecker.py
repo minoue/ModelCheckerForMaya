@@ -22,9 +22,9 @@ class Separator(QtWidgets.QWidget):
         self.checkerWidgets = checkers
         self.category = category
 
-        cb = QtWidgets.QCheckBox()
-        cb.setChecked(True)
-        cb.stateChanged.connect(self.checkboxToggle)
+        self.checkbox = QtWidgets.QCheckBox()
+        self.checkbox.setChecked(True)
+        self.checkbox.stateChanged.connect(self.checkboxToggle)
 
         line = QtWidgets.QFrame()
         line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -38,7 +38,7 @@ class Separator(QtWidgets.QWidget):
         label.setFont(font)
 
         layout = QtWidgets.QHBoxLayout()
-        layout.addWidget(cb)
+        layout.addWidget(self.checkbox)
         layout.addWidget(line)
         layout.addWidget(label)
         # layout.setSpacing(0)
@@ -219,6 +219,8 @@ class ModelSanityChecker(QtWidgets.QWidget):
         checkerObjs = [i() for i in checker.CHECKERS]
         checkerObjs.sort()
         self.checkerWidgets = [CheckerWidget(i, settings) for i in checkerObjs]
+        self.separators = []
+
         self.createUI()
 
     def createUI(self):
@@ -234,13 +236,20 @@ class ModelSanityChecker(QtWidgets.QWidget):
         scroll.setWidgetResizable(1)
 
         scrollLayout = QtWidgets.QVBoxLayout()
+
         currentCategory = self.checkerWidgets[0].checker.category
-        scrollLayout.addWidget(Separator(currentCategory, self.checkerWidgets))
+
+        sep = Separator(currentCategory, self.checkerWidgets)
+        self.separators.append(sep)
+        scrollLayout.addWidget(sep)
+
         for widget in self.checkerWidgets:
             if currentCategory != widget.checker.category:
                 cat = widget.checker.category
                 currentCategory = cat
-                scrollLayout.addWidget(Separator(cat, self.checkerWidgets))
+                sep = Separator(cat, self.checkerWidgets)
+                self.separators.append(sep)
+                scrollLayout.addWidget(sep)
             scrollLayout.addWidget(widget)
 
         content = QtWidgets.QWidget()
@@ -276,11 +285,12 @@ class ModelSanityChecker(QtWidgets.QWidget):
 
     def selectAllToggle(self, *args):
         state = args[0]
-        for w in self.checkerWidgets:
+
+        for s in self.separators:
             if state == 2:
-                w.setEnabled(True)
+                s.checkbox.setChecked(True)
             else:
-                w.setEnabled(False)
+                s.checkbox.setChecked(False)
 
     def setSelected(self):
         sel = cmds.ls(sl=True, fl=True, long=True)
@@ -317,10 +327,9 @@ class ModelSanityChecker(QtWidgets.QWidget):
             else:
                 print("{} checker is disabled. Skipped".format(checkerName))
 
-
             progDialog.setValue(num+1)
-            progDialog.setLabel(
-                QtWidgets.QLabel(r'Now checking "{}"'.format(widget.checker.name)))
+            progDialog.setLabel(QtWidgets.QLabel(
+                    r'Now checking "{}"'.format(widget.checker.name)))
             QtCore.QCoreApplication.processEvents()
 
         progDialog.close()
@@ -364,7 +373,6 @@ class CentralWidget(QtWidgets.QWidget):
         mainLayout.addWidget(self.tabWidget)
 
         self.setLayout(mainLayout)
-
 
 
 class MainWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
