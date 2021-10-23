@@ -8,7 +8,12 @@ from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya import cmds
 from . import checker
 from . import framelayout
-from importlib import reload
+
+try:
+    from importlib import reload
+except ImportError:
+    # if python2, use build-in reload
+    pass
 
 reload(framelayout)
 reload(checker)
