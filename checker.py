@@ -95,18 +95,26 @@ class TriangleChecker(BaseChecker):
     __category__ = "Topology"
     isWarning = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=0)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+
+        errs = cmds.checkMesh(obj, c=0)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -119,19 +127,26 @@ class NgonChecker(BaseChecker):
     __name__ = "N-gons"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=1)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=1)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -144,19 +159,26 @@ class NonmanifoldEdgeChecker(BaseChecker):
     __name__ = "Nonmanifold Edges"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=2)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=2)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -169,12 +191,14 @@ class NonmanifoldVertexChecker(BaseChecker):
     __name__ = "Nonmanifold Vertices"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
         errors = []
 
-        for obj in objs:
+        children = cmds.listRelatives(obj, fullPath=True, ad=True, type="mesh")
+
+        for obj in children:
             try:
                 errs = cmds.polyInfo(obj, nmv=True)
                 if errs:
@@ -194,22 +218,28 @@ class LaminaFaceChecker(BaseChecker):
     __name__ = "Lamina Faces"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=3)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=3)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
-
     def fixIt(self):
         pass
 
@@ -219,19 +249,26 @@ class BiValentFaceChecker(BaseChecker):
     __name__ = "Bi-valent Faces"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=4)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=4)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -244,21 +281,28 @@ class ZeroAreaFaceChecker(BaseChecker):
     __name__ = "Zero Area Faces"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings):
+    def checkIt(self, obj, settings):
         # type: (list) -> (list)
 
         mfa = settings.getSettings()['maxFaceArea']
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=5, maxFaceArea=mfa)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=5, maxFaceArea=mfa)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -272,19 +316,26 @@ class MeshBorderEdgeChecker(BaseChecker):
     isWarning = True
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=6)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=6)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -297,19 +348,26 @@ class CreaseEdgeChecker(BaseChecker):
     __name__ = "Crease Edges"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=7)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=7)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -322,19 +380,26 @@ class ZeroLengthEdgeChecker(BaseChecker):
     __name__ = "Zero-length Edges"
     __category__ = "Topology"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
+        errorsDict = {}
         errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=8)
-                if errs:
-                    errorObj = Error(obj, errs)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=8)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
@@ -348,21 +413,28 @@ class VertexPntsChecker(BaseChecker):
     __category__ = "Attribute"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
-        self.errors = []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                errs = cmds.checkMesh(obj, c=9)
-                if errs:
-                    errorObj = Error(obj)
-                    self.errors.append(errorObj)
-            except RuntimeError:
-                pass
+        errs = cmds.checkMesh(obj, c=9)
 
-        return self.errors
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
+
+        return errors
 
     def fixIt(self):
         mSel = OpenMaya.MSelectionList()
@@ -605,14 +677,18 @@ class GhostVertexChecker(BaseChecker):
     def __init__(self):
         super(GhostVertexChecker, self).__init__()
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
         errors = []
+        errorsDict = {}
+
+        children = cmds.listRelatives(obj, fullPath=True, ad=True, type="mesh") or []
+        children.append(obj)
 
         mSel = OpenMaya.MSelectionList()
-        for obj in objs:
-            mSel.add(obj)
+        for child in children:
+            mSel.add(child)
 
         for j in range(mSel.length()):
             dagPath = mSel.getDagPath(j)

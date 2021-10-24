@@ -131,16 +131,7 @@ class CheckerWidget(QtWidgets.QWidget):
                 return
             path = sel[0]
 
-        children = cmds.listRelatives(
-            path,
-            children=True,
-            ad=True,
-            fullPath=True,
-            type="transform") or []
-
-        children.append(path)
-
-        self.doCheck(children)
+        self.doCheck(path)
 
     def toggleEnable(self, *args):
         state = args[0]
@@ -150,12 +141,12 @@ class CheckerWidget(QtWidgets.QWidget):
         else:
             self.setEnabled(False)
 
-    def doCheck(self, objs):
+    def doCheck(self, obj):
 
         # Clear list items
         self.errorList.clear()
 
-        errs = self.checker.checkIt(objs, self.settings)
+        errs = self.checker.checkIt(obj, self.settings)
 
         if errs:
             for err in errs:
