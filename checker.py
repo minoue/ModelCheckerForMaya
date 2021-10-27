@@ -668,51 +668,40 @@ class KeyframeChecker(BaseChecker):
             cmds.delete(e.components)
 
 
-class GhostVertexChecker(BaseChecker):
-    """ Ghost vertex checker class """
+class UnusedVertexChecker(BaseChecker):
+    """ Unused vertex checker class """
 
-    __name__ = "Ghost Vertices"
+    __name__ = "Unused Vertices"
     __category__ = "Topology"
 
     def __init__(self):
-        super(GhostVertexChecker, self).__init__()
+        super(UnusedVertexChecker, self).__init__()
 
     def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
-        errors = []
         errorsDict = {}
+        errors = []
 
-        children = cmds.listRelatives(obj, fullPath=True, ad=True, type="mesh") or []
-        children.append(obj)
+        errs = cmds.checkMesh(obj, c=11)
 
-        mSel = OpenMaya.MSelectionList()
-        for child in children:
-            mSel.add(child)
+        for e in errs:
+            base, comp = e.split(".")
 
-        for j in range(mSel.length()):
-            dagPath = mSel.getDagPath(j)
-            try:
-                dagPath.extendToShape()
-                itVerts = OpenMaya.MItMeshVertex(dagPath)
-                badVerts = []
-                while not itVerts.isDone():
-                    numEdges = itVerts.numConnectedEdges()
-                    if numEdges == 0:
-                        fullPath = dagPath.fullPathName(
-                        ) + ".vtx[{}]".format(itVerts.index())
-                        badVerts.append(fullPath)
-                    itVerts.next()
-                if badVerts:
-                    errorObj = Error(dagPath.fullPathName(), badVerts)
-                    errors.append(errorObj)
-            except RuntimeError:
-                pass
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return errors
 
     def fixIt(self):
-        """ Ghost vertices ARE fixable """
+        """ Unused vertices ARE fixable """
 
         pass
 
@@ -1168,7 +1157,7 @@ CHECKERS = [
     CreaseEdgeChecker,
     ZeroLengthEdgeChecker,
     VertexPntsChecker,
-    GhostVertexChecker,
+    UnusedVertexChecker,
     IntermediateObjectChecker,
     DisplayLayerCheck,
     UnusedLayerChecker,
