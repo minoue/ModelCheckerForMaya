@@ -62,7 +62,7 @@ class Separator(QtWidgets.QWidget):
 
 class CheckerWidget(QtWidgets.QWidget):
 
-    def __init__(self, chk, settings=None):
+    def __init__(self, chk, parent, settings=None):
         # type: (checker.BaseChecker)
         super(CheckerWidget, self).__init__()
 
@@ -123,6 +123,10 @@ class CheckerWidget(QtWidgets.QWidget):
     def check(self, path=None, dummy=None):
         if not self.checker.isEnabled:
             return
+
+        root = self.parent().parent().parent().parent().rootLE.text()
+        if root != "":
+            path = root
 
         if path is None:
             sel = cmds.ls(sl=True, fl=True, long=True)
@@ -214,7 +218,7 @@ class ModelSanityChecker(QtWidgets.QWidget):
 
         checkerObjs = [i() for i in checker.CHECKERS]
         checkerObjs.sort()
-        self.checkerWidgets = [CheckerWidget(i, settings) for i in checkerObjs]
+        self.checkerWidgets = [CheckerWidget(i, self, settings) for i in checkerObjs]
         self.separators = []
 
         self.createUI()
