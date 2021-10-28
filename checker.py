@@ -416,25 +416,15 @@ class VertexPntsChecker(BaseChecker):
     def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
-        errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=9)
 
         for e in errs:
-            base, comp = e.split(".")
+            errObj = Error(e)
+            self.errors.append(errObj)
 
-            if base in errorsDict:
-                errorsDict[base].append(e)
-            else:
-                errorsDict[base] = [e]
-
-        for err_key in errorsDict:
-            components = errorsDict[err_key]
-            errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
-
-        return errors
+        return self.errors
 
     def fixIt(self):
         mSel = OpenMaya.MSelectionList()
@@ -478,10 +468,12 @@ class ShapeNameChecker(BaseChecker):
     __category__ = "Name"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for obj in objs:
             shapes = cmds.listRelatives(
@@ -516,10 +508,12 @@ class HistoryChecker(BaseChecker):
     isEnabled = True
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for obj in objs:
             mesh = cmds.listRelatives(obj, children=True, type="mesh")
@@ -543,7 +537,7 @@ class TransformChecker(BaseChecker):
     __name__ = "Transform"
     __category__ = "Attribute"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         ignore = []
@@ -552,6 +546,8 @@ class TransformChecker(BaseChecker):
 
         identity = OpenMaya.MMatrix.kIdentity
         mSel = OpenMaya.MSelectionList()
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for n, i in enumerate(objs):
             mSel.add(i)
@@ -581,10 +577,12 @@ class LockedTransformChecker(BaseChecker):
         super(LockedTransformChecker, self).__init__()
         self.attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"]
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for obj in objs:
             try:
@@ -611,19 +609,19 @@ class SmoothPreviewChecker(BaseChecker):
     __category__ = "Attribute"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
 
-        for obj in objs:
-            meshes = cmds.listRelatives(
-                obj, children=True, fullPath=True, type="mesh") or []
-            for i in meshes:
-                isSmooth = cmds.getAttr(i + ".displaySmoothMesh")
-                if isSmooth:
-                    err = Error(i)
-                    self.errors.append(err)
+        meshes = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+
+        for mesh in meshes:
+            isSmooth = cmds.getAttr(mesh + ".displaySmoothMesh")
+
+            if isSmooth:
+                err = Error(mesh)
+                self.errors.append(err)
 
         return self.errors
 
@@ -639,12 +637,14 @@ class KeyframeChecker(BaseChecker):
     __category__ = "Attribute"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
 
         keyNodes = ["animCurveTU", "animCurveTA", "animCurveTL"]
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for i in objs:
             conns = cmds.listConnections(i, source=True)
@@ -712,19 +712,19 @@ class IntermediateObjectChecker(BaseChecker):
     __category__ = "Node"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
 
-        for obj in objs:
-            children = cmds.listRelatives(
-                obj, ad=True, fullPath=True, type="mesh") or []
-            for i in children:
-                isIntermediate = cmds.getAttr(i + ".intermediateObject")
-                if isIntermediate:
-                    err = Error(i)
-                    self.errors.append(err)
+        meshes = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh")
+
+        for mesh in meshes:
+            isIntermediate = cmds.getAttr(mesh + ".intermediateObject")
+            if isIntermediate:
+                err = Error(mesh)
+                self.errors.append(err)
+
         return self.errors
 
     def fixIt(self):
@@ -749,10 +749,12 @@ class DisplayLayerCheck(BaseChecker):
     __category__ = "other"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         for obj in objs:
             layers = cmds.listConnections(obj + ".drawOverride") or []
@@ -778,7 +780,7 @@ class UnusedLayerChecker(BaseChecker):
     __category__ = "other"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
@@ -808,20 +810,18 @@ class Map1Checker(BaseChecker):
     __category__ = "UV"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
 
-        for obj in objs:
-            mesh = cmds.listRelatives(
-                obj, children=True, fullPath=True, type="mesh")
-            if mesh is not None:
-                for m in mesh:
-                    curUVSet = cmds.polyUVSet(m, q=True, currentUVSet=True)[0]
-                    if curUVSet != "map1":
-                        err = Error(m)
-                        self.errors.append(err)
+        meshes = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+
+        for mesh in meshes:
+            curUVSet = cmds.polyUVSet(mesh, q=True, currentUVSet=True)[0]
+            if curUVSet != "map1":
+                err = Error(mesh)
+                self.errors.append(err)
 
         return self.errors
 
@@ -836,9 +836,11 @@ class NegativeUvChecker(BaseChecker):
     __name__ = "UVs in negative space"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
         mSel = OpenMaya.MSelectionList()
 
@@ -877,9 +879,11 @@ class UdimIntersectionChecker(BaseChecker):
     __name__ = "UDIM intersection"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -902,9 +906,11 @@ class UnassignedUvChecker(BaseChecker):
     __name__ = "Unassigned UVs"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -927,9 +933,11 @@ class UnmappedPolygonFaceChecker(BaseChecker):
     __name__ = "Unmapped polygon faces"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -952,9 +960,11 @@ class ZeroAreaUVFaceChecker(BaseChecker):
     __name__ = "Zero area UV Faces"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -977,9 +987,11 @@ class ConcaveUVChecker(BaseChecker):
     __name__ = "Concave UV Faces"
     __category__ = "UV"
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -1003,9 +1015,11 @@ class ReversedUVChecker(BaseChecker):
     __category__ = "UV"
     isWarning = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
@@ -1029,9 +1043,11 @@ class UvOverlapChecker(BaseChecker):
     __category__ = "UV"
     isEnabled = False
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
 
         errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         mSel = OpenMaya.MSelectionList()
 
@@ -1073,21 +1089,26 @@ class SelectionSetChecker(BaseChecker):
 
         return []
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         self.errors = []
         objectSets = []
         ignore = ["modelPanel[0-9]ViewSelectedSet"]
 
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+
         for obj in objs:
             shapes = cmds.listRelatives(
                 obj, children=True, fullPath=True, shapes=True) or []
+
             for shape in shapes:
                 objectSets.extend(self.getSets(shape, "shape"))
+
             objectSets.extend(self.getSets(obj, "transform"))
 
         objectSets = list(set(objectSets))
+
         for objSet in objectSets:
             for i in ignore:
                 if re.match(i, objSet) is None:
@@ -1110,11 +1131,13 @@ class ColorSetChecker(BaseChecker):
     __category__ = "other"
     isFixable = True
 
-    def checkIt(self, objs, settings=None):
+    def checkIt(self, root, settings=None):
         # type: (list) -> (list)
 
         # Reset result
         self.errors = []
+
+        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
         for obj in objs:
             try:
