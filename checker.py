@@ -787,6 +787,28 @@ class InstanceShapeChecker(BaseChecker):
         pass
 
 
+class ConnectionChecker(BaseChecker):
+
+    __name__ = "Connections"
+    __category__ = "Node"
+
+    def checkIt(self, obj, settings=None):
+        # type: (list) -> (list)
+
+        self.errors = []
+
+        errs = cmds.checkMesh(obj, c=13)
+
+        for e in errs:
+            errObj = Error(e)
+            self.errors.append(errObj)
+
+        return self.errors
+
+    def fixIt(self):
+        pass
+
+
 class DisplayLayerCheck(BaseChecker):
 
     __name__ = "Display layers"
@@ -1228,6 +1250,7 @@ CHECKERS = [
     UnusedVertexChecker,
     IntermediateObjectChecker,
     InstanceShapeChecker,
+    ConnectionChecker,
     DisplayLayerCheck,
     UnusedLayerChecker,
     Map1Checker,
