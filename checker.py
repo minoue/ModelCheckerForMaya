@@ -945,21 +945,28 @@ class UdimIntersectionChecker(BaseChecker):
     __name__ = "UDIM intersection"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
-
+    def checkIt(self, obj, settings=None):
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=0)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=0)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
@@ -973,20 +980,27 @@ class UnassignedUvChecker(BaseChecker):
     __category__ = "UV"
 
     def checkIt(self, root, settings=None):
-
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=3)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=3)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
@@ -1000,20 +1014,27 @@ class UnmappedPolygonFaceChecker(BaseChecker):
     __category__ = "UV"
 
     def checkIt(self, root, settings=None):
-
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=1)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=1)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
@@ -1027,20 +1048,27 @@ class ZeroAreaUVFaceChecker(BaseChecker):
     __category__ = "UV"
 
     def checkIt(self, root, settings=None):
-
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=2)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=2)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
@@ -1054,20 +1082,27 @@ class ConcaveUVChecker(BaseChecker):
     __category__ = "UV"
 
     def checkIt(self, root, settings=None):
-
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=5)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=5)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
@@ -1082,20 +1117,27 @@ class ReversedUVChecker(BaseChecker):
     isWarning = True
 
     def checkIt(self, root, settings=None):
-
+        # type: (list) -> (list)
+        
         self.errors = []
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
+        errorsDict = {}
+        errors = []
 
-        for obj in objs:
-            try:
-                uvs = cmds.checkUV(obj, c=6)
-                if uvs:
-                    err = Error(obj, uvs)
-                    self.errors.append(err)
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        errs = cmds.checkUV(obj, c=6)
+
+        for e in errs:
+            base, comp = e.split(".")
+
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
+
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            errors.append(errorObj)
 
         return self.errors
 
