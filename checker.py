@@ -765,6 +765,28 @@ class IntermediateObjectChecker(BaseChecker):
                     pass
 
 
+class InstanceShapeChecker(BaseChecker):
+
+    __name__ = "Instance Shape"
+    __category__ = "Node"
+
+    def checkIt(self, obj, settings=None):
+        # type: (list) -> (list)
+
+        self.errors = []
+
+        errs = cmds.checkMesh(obj, c=12)
+
+        for e in errs:
+            errObj = Error(e)
+            self.errors.append(errObj)
+
+        return self.errors
+
+    def fixIt(self):
+        pass
+
+
 class DisplayLayerCheck(BaseChecker):
 
     __name__ = "Display layers"
@@ -1205,6 +1227,7 @@ CHECKERS = [
     EmptyGeometryChecker,
     UnusedVertexChecker,
     IntermediateObjectChecker,
+    InstanceShapeChecker,
     DisplayLayerCheck,
     UnusedLayerChecker,
     Map1Checker,
