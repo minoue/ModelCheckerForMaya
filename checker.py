@@ -438,6 +438,28 @@ class VertexPntsChecker(BaseChecker):
                 except RuntimeError:
                     pass
 
+class EmptyGeometryChecker(BaseChecker):
+
+    __name__ = "Empty Geometry"
+    __category__ = "Topology"
+    isFixable = False
+
+    def checkIt(self, obj, settings=None):
+        # type: (list) -> (list)
+
+        self.errors = []
+
+        errs = cmds.checkMesh(obj, c=10)
+
+        for e in errs:
+            errObj = Error(e)
+            self.errors.append(errObj)
+
+        return self.errors
+
+    def fixIt(self):
+        pass
+
 
 class NameChecker(BaseChecker):
 
@@ -1180,6 +1202,7 @@ CHECKERS = [
     CreaseEdgeChecker,
     ZeroLengthEdgeChecker,
     VertexPntsChecker,
+    EmptyGeometryChecker,
     UnusedVertexChecker,
     IntermediateObjectChecker,
     DisplayLayerCheck,
