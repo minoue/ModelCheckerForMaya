@@ -979,7 +979,7 @@ class UnassignedUvChecker(BaseChecker):
     __name__ = "Unassigned UVs"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
         
         self.errors = []
@@ -1013,7 +1013,7 @@ class UnmappedPolygonFaceChecker(BaseChecker):
     __name__ = "Unmapped polygon faces"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
         
         self.errors = []
@@ -1047,7 +1047,7 @@ class ZeroAreaUVFaceChecker(BaseChecker):
     __name__ = "Zero area UV Faces"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
         
         self.errors = []
@@ -1081,7 +1081,7 @@ class ConcaveUVChecker(BaseChecker):
     __name__ = "Concave UV Faces"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
         
         self.errors = []
@@ -1116,7 +1116,7 @@ class ReversedUVChecker(BaseChecker):
     __category__ = "UV"
     isWarning = True
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
         
         self.errors = []
