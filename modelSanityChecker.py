@@ -88,10 +88,13 @@ class CheckerWidget(QtWidgets.QWidget):
         self.fixButton.clicked.connect(self.fix)
         if self.checker.isFixable is not True:
             self.fixButton.setEnabled(False)
+        self.selectAllButton = QtWidgets.QPushButton('Select')
+        self.selectAllButton.clicked.connect(self.selectAll)
 
         buttonLayout = QtWidgets.QHBoxLayout()
         buttonLayout.addWidget(self.checkButton)
         buttonLayout.addWidget(self.fixButton)
+        buttonLayout.addWidget(self.selectAllButton)
 
         self.errorList = QtWidgets.QListWidget()
         self.errorList.itemClicked.connect(self.errorSelected)
@@ -182,6 +185,10 @@ class CheckerWidget(QtWidgets.QWidget):
             cmds.select(err.longName, r=True)
         else:
             cmds.select(err.components, r=True)
+    
+    def selectAll(self):
+        errs = [i.longName for i in self.checker.errors]
+        cmds.select(errs, r=True)
 
 
 class Settings(QtWidgets.QWidget):
