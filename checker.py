@@ -903,37 +903,25 @@ class NegativeUvChecker(BaseChecker):
     __name__ = "UVs in negative space"
     __category__ = "UV"
 
-    def checkIt(self, root, settings=None):
+    def checkIt(self, obj, settings=None):
 
         self.errors = []
+        errorsDict = {}
 
-        objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        errs = cmds.checkUV(obj, c=4)
 
-        mSel = OpenMaya.MSelectionList()
+        for e in errs:
+            base, comp = e.split(".")
 
-        for obj in objs:
-            mSel.add(obj)
+            if base in errorsDict:
+                errorsDict[base].append(e)
+            else:
+                errorsDict[base] = [e]
 
-        for i in range(mSel.length()):
-            dagPath = mSel.getDagPath(i)
-            try:
-                dagPath.extendToShape()
-                badUVs = []
-                fnMesh = OpenMaya.MFnMesh(dagPath)
-                uArray, vArray = fnMesh.getUVs()
-
-                for index, uv in enumerate(zip(uArray, vArray)):
-                    if uv[0] < 0 or uv[1] < 0:
-                        fullPath = dagPath.fullPathName() + \
-                            ".map[{}]".format(index)
-                        badUVs.append(fullPath)
-                if badUVs:
-                    err = Error(dagPath.fullPathName(), badUVs)
-                    self.errors.append(err)
-
-            except RuntimeError:
-                # Not mesh. Do no nothing
-                pass
+        for err_key in errorsDict:
+            components = errorsDict[err_key]
+            errorObj = Error(err_key, errorsDict[err_key])
+            self.errors.append(errorObj)
 
         return self.errors
 
