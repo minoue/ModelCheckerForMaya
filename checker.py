@@ -99,7 +99,7 @@ class TriangleChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=0)
 
@@ -114,9 +114,9 @@ class TriangleChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -131,7 +131,7 @@ class NgonChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=1)
 
@@ -146,9 +146,9 @@ class NgonChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -163,7 +163,7 @@ class NonmanifoldEdgeChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=2)
 
@@ -178,9 +178,9 @@ class NonmanifoldEdgeChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -194,7 +194,7 @@ class NonmanifoldVertexChecker(BaseChecker):
     def checkIt(self, obj, settings=None):
         # type: (list) -> (list)
 
-        errors = []
+        self.errors = []
 
         children = cmds.listRelatives(obj, fullPath=True, ad=True, type="mesh")
 
@@ -203,11 +203,11 @@ class NonmanifoldVertexChecker(BaseChecker):
                 errs = cmds.polyInfo(obj, nmv=True)
                 if errs:
                     errorObj = Error(obj, errs)
-                    errors.append(errorObj)
+                    self.errors.append(errorObj)
             except RuntimeError:
                 pass
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -222,7 +222,7 @@ class LaminaFaceChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=3)
 
@@ -237,9 +237,10 @@ class LaminaFaceChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
+
     def fixIt(self):
         pass
 
@@ -253,7 +254,7 @@ class BiValentFaceChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=4)
 
@@ -268,9 +269,9 @@ class BiValentFaceChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -287,7 +288,7 @@ class ZeroAreaFaceChecker(BaseChecker):
         mfa = settings.getSettings()['maxFaceArea']
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=5, maxFaceArea=mfa)
 
@@ -302,9 +303,9 @@ class ZeroAreaFaceChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -320,7 +321,7 @@ class MeshBorderEdgeChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=6)
 
@@ -335,9 +336,9 @@ class MeshBorderEdgeChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -352,7 +353,7 @@ class CreaseEdgeChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=7)
 
@@ -367,9 +368,9 @@ class CreaseEdgeChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -384,7 +385,7 @@ class ZeroLengthEdgeChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=8)
 
@@ -399,9 +400,9 @@ class ZeroLengthEdgeChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -470,7 +471,7 @@ class NameChecker(BaseChecker):
     def checkIt(self, objs, settings=None):
         # type: (list) -> (list)
 
-        errors = []
+        self.errors = []
 
         for obj in objs:
             try:
@@ -478,7 +479,7 @@ class NameChecker(BaseChecker):
             except RuntimeError:
                 pass
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -564,7 +565,7 @@ class TransformChecker(BaseChecker):
 
         ignore = []
 
-        errors = []
+        self.errors = []
 
         identity = OpenMaya.MMatrix.kIdentity
         mSel = OpenMaya.MSelectionList()
@@ -581,9 +582,9 @@ class TransformChecker(BaseChecker):
             transform = dagNode.transformationMatrix()
             if not transform == identity:
                 errorObj = Error(i)
-                errors.append(errorObj)
+                self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -703,7 +704,7 @@ class UnusedVertexChecker(BaseChecker):
         # type: (list) -> (list)
 
         errorsDict = {}
-        errors = []
+        self.errors = []
 
         errs = cmds.checkMesh(obj, c=11)
 
@@ -718,9 +719,9 @@ class UnusedVertexChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         """ Unused vertices ARE fixable """
@@ -904,7 +905,7 @@ class NegativeUvChecker(BaseChecker):
 
     def checkIt(self, root, settings=None):
 
-        errors = []
+        self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
 
@@ -928,13 +929,13 @@ class NegativeUvChecker(BaseChecker):
                         badUVs.append(fullPath)
                 if badUVs:
                     err = Error(dagPath.fullPathName(), badUVs)
-                    errors.append(err)
+                    self.errors.append(err)
 
             except RuntimeError:
                 # Not mesh. Do no nothing
                 pass
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
@@ -951,7 +952,6 @@ class UdimIntersectionChecker(BaseChecker):
         self.errors = []
 
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=0)
 
@@ -966,7 +966,7 @@ class UdimIntersectionChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -985,7 +985,6 @@ class UnassignedUvChecker(BaseChecker):
         self.errors = []
 
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=3)
 
@@ -1000,7 +999,7 @@ class UnassignedUvChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -1019,7 +1018,6 @@ class UnmappedPolygonFaceChecker(BaseChecker):
         self.errors = []
 
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=1)
 
@@ -1034,7 +1032,7 @@ class UnmappedPolygonFaceChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -1051,9 +1049,7 @@ class ZeroAreaUVFaceChecker(BaseChecker):
         # type: (list) -> (list)
         
         self.errors = []
-
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=2)
 
@@ -1068,7 +1064,7 @@ class ZeroAreaUVFaceChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -1085,9 +1081,7 @@ class ConcaveUVChecker(BaseChecker):
         # type: (list) -> (list)
         
         self.errors = []
-
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=5)
 
@@ -1102,7 +1096,7 @@ class ConcaveUVChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -1120,9 +1114,7 @@ class ReversedUVChecker(BaseChecker):
         # type: (list) -> (list)
         
         self.errors = []
-
         errorsDict = {}
-        errors = []
 
         errs = cmds.checkUV(obj, c=6)
 
@@ -1137,7 +1129,7 @@ class ReversedUVChecker(BaseChecker):
         for err_key in errorsDict:
             components = errorsDict[err_key]
             errorObj = Error(err_key, errorsDict[err_key])
-            errors.append(errorObj)
+            self.errors.append(errorObj)
 
         return self.errors
 
@@ -1153,7 +1145,7 @@ class UvOverlapChecker(BaseChecker):
 
     def checkIt(self, root, settings=None):
 
-        errors = []
+        self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="mesh") or []
 
@@ -1171,7 +1163,7 @@ class UvOverlapChecker(BaseChecker):
                 # Not mesh. Do no nothing
                 pass
 
-        return errors
+        return self.errors
 
     def fixIt(self):
         pass
