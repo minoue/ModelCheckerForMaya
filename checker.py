@@ -497,6 +497,7 @@ class ShapeNameChecker(BaseChecker):
         self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for obj in objs:
             shapes = cmds.listRelatives(
@@ -537,6 +538,7 @@ class HistoryChecker(BaseChecker):
         self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for obj in objs:
             mesh = cmds.listRelatives(obj, children=True, type="mesh")
@@ -571,6 +573,7 @@ class TransformChecker(BaseChecker):
         mSel = OpenMaya.MSelectionList()
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for n, i in enumerate(objs):
             mSel.add(i)
@@ -606,6 +609,7 @@ class LockedTransformChecker(BaseChecker):
         self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for obj in objs:
             try:
@@ -668,6 +672,7 @@ class KeyframeChecker(BaseChecker):
         keyNodes = ["animCurveTU", "animCurveTA", "animCurveTL"]
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for i in objs:
             conns = cmds.listConnections(i, source=True)
@@ -822,6 +827,7 @@ class DisplayLayerCheck(BaseChecker):
         self.errors = []
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for obj in objs:
             layers = cmds.listConnections(obj + ".drawOverride") or []
@@ -1185,6 +1191,7 @@ class SelectionSetChecker(BaseChecker):
         ignore = ["modelPanel[0-9]ViewSelectedSet"]
 
         objs = cmds.listRelatives(root, ad=True, fullPath=True, type="transform") or []
+        objs.insert(0, root)
 
         for obj in objs:
             shapes = cmds.listRelatives(
