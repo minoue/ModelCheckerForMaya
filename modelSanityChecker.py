@@ -3,11 +3,18 @@
 module docstring here
 """
 
-from PySide2 import QtCore, QtWidgets, QtGui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya import cmds
 from . import checker
 from . import framelayout
+
+MAYA_VERSION = 2025
+
+try:
+    from PySide6 import QtCore, QtWidgets, QtGui
+except ImportError:
+    from PySide2 import QtCore, QtWidgets, QtGui
+    MAYA_VERSION = 2024
 
 try:
     from importlib import reload
@@ -415,7 +422,11 @@ class MainWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         menu = self.menuBar()
 
         # About
-        aboutAction = QtWidgets.QAction("&About", self)
+        if MAYA_VERSION != 2025:
+            aboutAction = QtWidgets.QAction("&About", self)
+        else:
+            aboutAction = QtGui.QAction("&About", self)
+
         aboutAction.setStatusTip('About this script')
         aboutAction.triggered.connect(self.showAbout)
 
@@ -428,7 +439,7 @@ class MainWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         About message
         """
 
-        QtWidgets.QMessageBox.about(self, 'About ', 'test\n')
+        QtWidgets.QMessageBox.about(self, 'About ', 'ModelSanityChecker\n')
 
     def run(self):
         try:
