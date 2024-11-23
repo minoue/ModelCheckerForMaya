@@ -3,13 +3,17 @@
 ![img](./images/ui.png)
 
 ## Requirements
+Install the following plugins and load them first.
 
-[CheckTools plugins](https://github.com/minoue/CheckTools)
+* [CheckTools](https://github.com/minoue/CheckTools)
 
 ## Usage
 
 python
-```
+
+```python
 from ModelCheckerForMaya import modelSanityChecker
 modelSanityChecker.main()
+
 ```
+Select object and press the check buttons
